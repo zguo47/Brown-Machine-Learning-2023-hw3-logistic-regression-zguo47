@@ -53,8 +53,27 @@ class LogisticRegression:
         @return:
             num_epochs: integer representing the number of epochs taken to reach convergence
         '''
-        # TODO
-        pass
+        converge = False
+        num_epochs = 0
+        m, n = X.shape
+        while converge != True:
+            last_batch_loss = self.loss(X, Y)
+            num_epochs += 1
+            np.random.shuffle(X)
+            for i in range((m*n)//self.batch_size-1):
+                X_batch = X[i*self.batch_size: (i+1)*self.batch_size]
+                Y_batch = Y[i*self.batch_size: (i+1)*self.batch_size]
+                d_loss = np.zeros(self.weights.shape)
+                for x, y in zip(X_batch, Y_batch):
+                    for j in range(self.n_classes-1):
+                        if y == j:
+                            d_loss[j] += (softmax(self.weights * x)[j]-1)*x
+                        else:
+                            d_loss[j] += (softmax(self.weights * x)[j])*x
+                self.weights -= (self.alpha*d_loss)/len(X)
+            if abs(self.loss(X, Y) - last_batch_loss) < self.conv_threshold:
+                break
+        return num_epochs
 
     def loss(self, X, Y):
         '''
@@ -65,8 +84,12 @@ class LogisticRegression:
         @return:
             A float number which is the average loss of the model on the dataset
         '''
-        # TODO
-        pass
+        loss = 0
+        for x, y in zip(X, Y):
+            for j in range(self.n_classes-1):
+                if y == j:
+                    loss += np.log(1/(1+np.exp(-x))[j])
+        return -loss/self.n_classes
 
     def predict(self, X):
         '''
@@ -77,8 +100,8 @@ class LogisticRegression:
         @return:
             A 1D Numpy array with one element for each row in X containing the predicted class.
         '''
-        # TODO
-        pass
+        labels = np.argmax(softmax(np.dot(self.weights, np.transpose(X))),axis=0)
+        return labels
 
     def accuracy(self, X, Y):
         '''
@@ -90,5 +113,5 @@ class LogisticRegression:
         @return:
             a float number indicating accuracy (between 0 and 1)
         '''
-        # TODO
-        pass
+        ypred = self.predict(X)
+        return np.sum(ypred == Y)/len(Y)
