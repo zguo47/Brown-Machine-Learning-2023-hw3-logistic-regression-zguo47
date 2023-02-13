@@ -32,7 +32,7 @@ CENSUS_FILE_PATH = ROOT_DIR_PREFIX + DATA_FILE_NAME
 
 NUM_CLASSES = 3
 BATCH_SIZE = 1  #tune this parameter
-CONV_THRESHOLD = 1 #tune this parameter
+CONV_THRESHOLD = 0.1 #tune this parameter
 
 def import_census(file_path):
     '''

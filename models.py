@@ -55,24 +55,27 @@ class LogisticRegression:
         '''
         converge = False
         num_epochs = 0
-        m, n = X.shape
+        last_batch_loss = 100000000
         while converge != True:
-            last_batch_loss = self.loss(X, Y)
             num_epochs += 1
-            np.random.shuffle(X)
-            for i in range((m*n)//self.batch_size-1):
+            p = np.random.permutation(len(X))
+            X = X[p]
+            Y = Y[p]
+            for i in range((int)(len(Y)/self.batch_size-1)):
                 X_batch = X[i*self.batch_size: (i+1)*self.batch_size]
                 Y_batch = Y[i*self.batch_size: (i+1)*self.batch_size]
                 d_loss = np.zeros(self.weights.shape)
                 for x, y in zip(X_batch, Y_batch):
-                    for j in range(self.n_classes-1):
+                    for j in range(self.n_classes):
                         if y == j:
-                            d_loss[j] += (softmax(self.weights * x)[j]-1)*x
+                            d_loss[j] += (softmax(self.weights @ x)[j]-1)*x
                         else:
-                            d_loss[j] += (softmax(self.weights * x)[j])*x
-                self.weights -= (self.alpha*d_loss)/len(X)
+                            d_loss[j] += (softmax(self.weights @ x)[j])*x
+                self.weights = self.weights - (self.alpha*d_loss)/len(X_batch)
             if abs(self.loss(X, Y) - last_batch_loss) < self.conv_threshold:
                 break
+            else:
+                last_batch_loss = self.loss(X, Y)
         return num_epochs
 
     def loss(self, X, Y):
@@ -85,11 +88,11 @@ class LogisticRegression:
             A float number which is the average loss of the model on the dataset
         '''
         loss = 0
-        for x, y in zip(X, Y):
-            for j in range(self.n_classes-1):
-                if y == j:
-                    loss += np.log(1/(1+np.exp(-x))[j])
-        return -loss/self.n_classes
+        predict = np.asarray([softmax(self.weights @ x) for x in X])
+        for j in range(len(Y)):
+            if np.argmax(predict[j]) == Y[j]:
+                loss = loss + np.log(np.max(predict[j]))
+        return -loss
 
     def predict(self, X):
         '''
