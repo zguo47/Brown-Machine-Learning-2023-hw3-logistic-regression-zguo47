@@ -24,14 +24,14 @@ from models import LogisticRegression
 
 ROOT_DIR_PREFIX = './data/'
 
-DATA_FILE_NAME = 'normalized_data.csv'
+# DATA_FILE_NAME = 'normalized_data.csv'
 # DATA_FILE_NAME = 'unnormalized_data.csv'
-# DATA_FILE_NAME = 'normalized_data_nosens.csv'
+DATA_FILE_NAME = 'normalized_data_nosens.csv'
 
 CENSUS_FILE_PATH = ROOT_DIR_PREFIX + DATA_FILE_NAME
 
 NUM_CLASSES = 3
-BATCH_SIZE = 1  #tune this parameter
+BATCH_SIZE = 5  #tune this parameter
 CONV_THRESHOLD = 0.1 #tune this parameter
 
 def import_census(file_path):
